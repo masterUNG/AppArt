@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:convert' as convert;
 
 import 'package:animation_search_bar/animation_search_bar.dart';
+import 'package:app_deaf/pages/question_page.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -90,48 +91,107 @@ class _ContentPageState extends State<ContentPage> {
                   offset: Offset(0, 5))
             ]),
             alignment: Alignment.center,
-            child: AnimationSearchBar(
-                backIconColor: Colors.black,
-                centerTitle: 'บทเรียน',
-                onChanged: (text) {
-                  debugPrint(text);
-                },
-                searchTextEditingController: controller,
-                horizontalPadding: 5),
+            child: load
+                ? const SizedBox()
+                : haveData!
+                    ? AnimationSearchBar(
+                        backIconColor: Colors.black,
+                        centerTitle: 'บทเรียน',
+                        onChanged: (text) {
+                          debugPrint(text);
+
+                          debouncer.run(() {
+                            if (searchContentModels.isNotEmpty) {
+                              searchContentModels.clear();
+                              searchContentModels.addAll(contentModels);
+                            }
+
+                            searchContentModels = searchContentModels
+                                .where((element) => element.contentname
+                                    .toLowerCase()
+                                    .contains(text.trim().toLowerCase()))
+                                .toList();
+                            setState(() {});
+                          });
+                        },
+                        searchTextEditingController: controller,
+                        horizontalPadding: 5)
+                    : Row(
+                        children: [
+                          IconButton(
+                              onPressed: () {
+                                Get.back();
+                              },
+                              icon: Icon(Icons.arrow_back)),
+                          Text('ไม่มี บทเรียน'),
+                        ],
+                      ),
           ),
         ),
       ),
       // body listview
-      body: load ? const Center(child: CircularProgressIndicator()) : haveData! ? ListView.builder(
-                  itemCount: searchContentModels.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Card(
-                      shadowColor: const Color.fromARGB(220, 6, 6, 6),
-                      color: const Color(0xFFFFB200),
-                      child: InkWell(
-                        // กดไปหน้า content
-                        onTap: () {
-                          _handleCilkContentVideo(
-                              contentModel: searchContentModels[index]);
-                        },
+      body: LayoutBuilder(builder: (context, BoxConstraints boxConstraints) {
+        return SizedBox(
+          width: boxConstraints.maxWidth,
+          height: boxConstraints.maxHeight,
+          child: Stack(
+            // fit: StackFit.expand,
+            children: [
+              mainContent(),
+              Positioned(
+                bottom: 16,
+                right: 16,
+                child: ElevatedButton(
+                  onPressed: () {
+                    print('you Click course_id --> ${widget.couresModel.id}');
+                    Get.to(QuestionPage(courseModel: widget.couresModel));
+                  },
+                  child: const Text('ทดสอบ'),
+                ),
+              ),
+            ],
+          ),
+        );
+      }),
+    );
+  }
 
-                        child: Padding(
-                          padding: const EdgeInsets.all(20.6),
-                          child: Column(
-                            children: [
-                              Text(
-                                searchContentModels[index].contentname.toString(),
-                                style: const TextStyle(
-                                  fontSize: 20.0,
-                                ),
-                              )
-                            ],
-                          ),
+  Widget mainContent() {
+    return load
+        ? const Center(child: CircularProgressIndicator())
+        : haveData!
+            ? ListView.builder(
+                itemCount: searchContentModels.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return Card(
+                    shadowColor: const Color.fromARGB(220, 6, 6, 6),
+                    color: const Color(0xFFFFB200),
+                    child: InkWell(
+                      // กดไปหน้า content
+                      onTap: () {
+                        _handleCilkContentVideo(
+                            contentModel: searchContentModels[index]);
+                      },
+
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.6),
+                        child: Column(
+                          children: [
+                            Text(
+                              searchContentModels[index].contentname.toString(),
+                              style: const TextStyle(
+                                fontSize: 20.0,
+                              ),
+                            )
+                          ],
                         ),
                       ),
-                    );
-                  }) : const Text('ยังไม่มี บทเรียน')  ,
-    );
+                    ),
+                  );
+                })
+            : const Center(
+                child: Text('ยังไม่มี บทเรียน'),
+              );
   }
 
   void _handleCilkContentVideo({required ContentModel contentModel}) {
