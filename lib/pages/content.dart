@@ -31,6 +31,7 @@ class _ContentPageState extends State<ContentPage> {
 
   final debouncer = Debouncer(milliSecond: 500);
   var contentModels = <ContentModel>[];
+  var searchContentModels = <ContentModel>[];
 
   @override
   void initState() {
@@ -44,7 +45,11 @@ class _ContentPageState extends State<ContentPage> {
   }
 
   Future<void> readContentFromCouceId() async {
-    contentModels = await ContentsApi.futureContentApi(couresModel: widget.couresModel);
+    contentModels =
+        await ContentsApi.futureContentApi(couresModel: widget.couresModel);
+    searchContentModels.addAll(contentModels);
+    print('ขนาดของ searchModel --> ${searchContentModels.length}');
+    setState(() {});
   }
 
   @override
