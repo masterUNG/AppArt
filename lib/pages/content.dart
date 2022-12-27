@@ -57,9 +57,13 @@ class _ContentPageState extends State<ContentPage> {
         haveData = true;
 
         for (var element in convert.json.decode(value.data)) {
-          
+          ContentModel model = ContentModel.fromMap(element);
+          contentModels.add(model);
         }
       }
+      searchContentModels.addAll(contentModels);
+      print(
+          'ขนาด searchContentModel --> ${searchContentModels.length}, haveData --> $haveData');
       load = false;
       setState(() {});
     });
