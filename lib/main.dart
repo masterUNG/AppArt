@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:app_deaf/routers.dart';
 import 'package:app_deaf/pages/menu/navbar.dart';
 import 'package:app_deaf/utils/app_constant.dart';
@@ -7,6 +9,7 @@ import 'package:get/get.dart';
 final navigatorState = GlobalKey<NavigatorState>();
 
 void main() {
+  HttpOverrides.global = MyHttpOverride();
   runApp(const MyApp());
 }
 
@@ -29,5 +32,14 @@ class MyApp extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class MyHttpOverride extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    // TODO: implement createHttpClient
+    return super.createHttpClient(context)
+      ..badCertificateCallback = (cert, host, port) => true;
   }
 }

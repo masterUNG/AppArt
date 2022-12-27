@@ -10,8 +10,10 @@ import 'package:app_deaf/utils/constarts.dart';
 
 class CouresApi {
   static Future<List<Coures>> futureCouresApi() async {
-    final response =
-        await http.get(Uri.parse(phpApi +'/getcoures.php'));
+
+    String urlApi = 'https://www.androidthai.in.th/fluttertraining/getAllCorseUng.php';
+
+    final response = await http.get(Uri.parse(urlApi));
 
     if (response.statusCode == 200) {
       //pares data
