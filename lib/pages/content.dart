@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:convert' as convert;
 
 import 'package:animation_search_bar/animation_search_bar.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -32,6 +33,8 @@ class _ContentPageState extends State<ContentPage> {
   final debouncer = Debouncer(milliSecond: 500);
   var contentModels = <ContentModel>[];
   var searchContentModels = <ContentModel>[];
+  bool load = true;
+  bool? haveData;
 
   @override
   void initState() {
@@ -45,11 +48,21 @@ class _ContentPageState extends State<ContentPage> {
   }
 
   Future<void> readContentFromCouceId() async {
-    contentModels =
-        await ContentsApi.futureContentApi(couresModel: widget.couresModel);
-    searchContentModels.addAll(contentModels);
-    print('ขนาดของ searchModel --> ${searchContentModels.length}');
-    setState(() {});
+    String urlApi =
+        'https://www.androidthai.in.th/fluttertraining/getContentWhereIdCourseUng.php?isAdd=true&coure_id=${widget.couresModel.id}';
+    await Dio().get(urlApi).then((value) {
+      if (value == 'null') {
+        haveData = false;
+      } else {
+        haveData = true;
+
+        for (var element in convert.json.decode(value.data)) {
+          
+        }
+      }
+      load = false;
+      setState(() {});
+    });
   }
 
   @override
