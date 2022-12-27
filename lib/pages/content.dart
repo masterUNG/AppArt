@@ -50,8 +50,10 @@ class _ContentPageState extends State<ContentPage> {
   Future<void> readContentFromCouceId() async {
     String urlApi =
         'https://www.androidthai.in.th/fluttertraining/getContentWhereIdCourseUng.php?isAdd=true&coure_id=${widget.couresModel.id}';
+
+    print('urlAPI ---> $urlApi');
     await Dio().get(urlApi).then((value) {
-      if (value == 'null') {
+      if (value.toString() == 'null') {
         haveData = false;
       } else {
         haveData = true;
@@ -61,7 +63,9 @@ class _ContentPageState extends State<ContentPage> {
           contentModels.add(model);
         }
       }
-      searchContentModels.addAll(contentModels);
+      if (contentModels.isNotEmpty) {
+        searchContentModels.addAll(contentModels);
+      }
       print(
           'ขนาด searchContentModel --> ${searchContentModels.length}, haveData --> $haveData');
       load = false;
@@ -98,22 +102,17 @@ class _ContentPageState extends State<ContentPage> {
         ),
       ),
       // body listview
-      body: FutureBuilder<List<ContentModel>>(
-          future: futureContent,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              //List<Coures> coures = snapshot.data;
-              return ListView.builder(
-                  itemCount: snapshot.data!.length,
+      body: load ? const Center(child: CircularProgressIndicator()) : haveData! ? ListView.builder(
+                  itemCount: searchContentModels.length,
                   itemBuilder: (BuildContext context, int index) {
                     return Card(
-                      shadowColor: Color.fromARGB(220, 6, 6, 6),
-                      color: Color(0xFFFFB200),
+                      shadowColor: const Color.fromARGB(220, 6, 6, 6),
+                      color: const Color(0xFFFFB200),
                       child: InkWell(
                         // กดไปหน้า content
                         onTap: () {
                           _handleCilkContentVideo(
-                              contentModel: snapshot.data![index]);
+                              contentModel: searchContentModels[index]);
                         },
 
                         child: Padding(
@@ -121,8 +120,8 @@ class _ContentPageState extends State<ContentPage> {
                           child: Column(
                             children: [
                               Text(
-                                snapshot.data![index].contentname.toString(),
-                                style: TextStyle(
+                                searchContentModels[index].contentname.toString(),
+                                style: const TextStyle(
                                   fontSize: 20.0,
                                 ),
                               )
@@ -131,12 +130,7 @@ class _ContentPageState extends State<ContentPage> {
                         ),
                       ),
                     );
-                  });
-            } else if (snapshot.hasError) {
-              return Center(child: Text("ยังไม่มี Content"));
-            }
-            return CircularProgressIndicator();
-          }),
+                  }) : const Text('ยังไม่มี บทเรียน')  ,
     );
   }
 

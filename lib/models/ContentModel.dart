@@ -45,6 +45,10 @@ class ContentModel {
         "content_text": contentText,
     };
 
+  
+
+  
+
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'id': id,
@@ -67,5 +71,5 @@ class ContentModel {
     );
   }
 
-  
+ 
 }
