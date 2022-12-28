@@ -87,7 +87,10 @@ class _QuestionPageState extends State<QuestionPage> {
         title: Text(couresModel!.couresname),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              print('corrects --> $corrects');
+              print('trueCorrect ---> $trueCorrects');
+            },
             icon: const Icon(Icons.check_box),
           )
         ],
