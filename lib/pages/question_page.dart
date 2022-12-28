@@ -9,6 +9,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 import 'package:app_deaf/models/Coures.dart';
+import 'package:get/get.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
 
 class QuestionPage extends StatefulWidget {
   const QuestionPage({
@@ -88,8 +90,29 @@ class _QuestionPageState extends State<QuestionPage> {
         actions: [
           IconButton(
             onPressed: () {
+              bool status = true;
               print('corrects --> $corrects');
               print('trueCorrect ---> $trueCorrects');
+              for (var element in corrects) {
+                if (element == null) {
+                  status = false;
+                }
+              }
+
+              if (status) {
+                int score = 0;
+                for (var i = 0; i < corrects.length; i++) {
+                  if (corrects[i] == trueCorrects[i]) {
+                    score++;
+                  }
+                }
+                Get.snackbar('Score', '$score คะแนน',
+                    snackPosition: SnackPosition.BOTTOM);
+              } else {
+                print('ตอบไม่ครบ');
+                Get.snackbar('ทำไม่ครบ', 'กรุณาทำให้ครบ ข้อ',
+                    snackPosition: SnackPosition.BOTTOM);
+              }
             },
             icon: const Icon(Icons.check_box),
           )
